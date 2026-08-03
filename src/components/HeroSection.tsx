@@ -125,10 +125,10 @@ export default function HeroSection({
   return (
     <section className="bg-white border-b border-slate-200">
       <div className="max-w-[1400px] mx-auto px-4 py-5">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-3 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-3">
           {/* Slider */}
           <div className="relative overflow-hidden rounded-xl shadow-lg shadow-slate-900/10 group">
-            <div className="relative aspect-[16/9]">
+            <div className="relative aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[520px]">
               <AnimatePresence mode="sync" initial={false}>
                 <motion.div
                   key={aktif}
