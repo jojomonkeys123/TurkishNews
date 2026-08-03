@@ -7,6 +7,7 @@
 
 import { createClient } from '@sanity/client'
 import Parser from 'rss-parser'
+import { kategoriYazariGetir } from './lib/yazar-esleme.mjs'
 
 const sanity = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -201,10 +202,6 @@ async function slugVarMi(slug) {
   return (await sanity.fetch(`count(*[_type == "makale" && slug.current == $slug])`, { slug })) > 0
 }
 
-async function varsayilanYazarId() {
-  return sanity.fetch(`*[_type == "yazar"][0]._id`)
-}
-
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
 async function main() {
   if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || !process.env.GROQ_API_KEY) {
@@ -216,7 +213,6 @@ async function main() {
   const haberler = await haberleriTara()
   console.log(`${haberler.length} güncel haber bulundu, önem skoru hesaplanıyor...\n`)
 
-  const yazarId = await varsayilanYazarId()
   let yayinlanan = 0
 
   for (const haber of haberler.slice(0, 20)) {
@@ -244,6 +240,7 @@ async function main() {
 
     console.log(`  🔴 ${puan}/10 — SON DAKİKA: ${baslik.slice(0, 60)}`)
 
+    const yazarId = await kategoriYazariGetir(sanity, kategori)
     const assetId = await gorselBulVeYukle(baslik, slug)
     const ozetHam = icerik.replace(/^##.+$/gm, '').replace(/\n+/g, ' ').trim().slice(0, 200)
     const ozet = ozetHam.slice(0, ozetHam.lastIndexOf(' ')) + '…'

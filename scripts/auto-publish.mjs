@@ -7,6 +7,7 @@
 
 import { createClient } from '@sanity/client'
 import Parser from 'rss-parser'
+import { kategoriYazariGetir } from './lib/yazar-esleme.mjs'
 
 // ── Clients ──────────────────────────────────────────────────────────────────
 const sanity = createClient({
@@ -141,13 +142,6 @@ function metniBloklaraCevir(metin) {
 async function slugVarMi(slug) {
   const sonuc = await sanity.fetch(`count(*[_type == "makale" && slug.current == $slug])`, { slug })
   return sonuc > 0
-}
-
-async function kategoriYazariGetir(kategori) {
-  const id = await sanity.fetch(
-    `*[_type == "yazar"][0]._id`
-  )
-  return id
 }
 
 function oncelikHesapla(baslik, ozet) {
@@ -371,7 +365,7 @@ async function main() {
         const ozetHam = icerik.replace(/^##.+$/gm, '').replace(/\n+/g, ' ').trim().slice(0, 200)
         const ozet = ozetHam.slice(0, ozetHam.lastIndexOf(' ')) + '…'
         const oncelik = oncelikHesapla(baslik, ozet)
-        const yazarId = await kategoriYazariGetir(kategori)
+        const yazarId = await kategoriYazariGetir(sanity, kategori)
 
         let kapakGorseli
         try {

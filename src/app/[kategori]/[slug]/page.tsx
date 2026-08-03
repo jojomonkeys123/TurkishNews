@@ -24,9 +24,32 @@ export async function generateMetadata({
   const { kategori, slug } = await params;
   const makale = await getMakale(kategori, slug);
   if (!makale) return {};
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const url = `${siteUrl}/${kategori}/${slug}`;
+  const baslik = makale.metaBaslik || makale.baslik;
+  const aciklama = makale.metaAciklama || makale.ozet;
+
   return {
-    title: makale.metaBaslik || makale.baslik,
-    description: makale.metaAciklama || makale.ozet,
+    title: baslik,
+    description: aciklama,
+    alternates: { canonical: url },
+    openGraph: {
+      title: baslik,
+      description: aciklama,
+      url,
+      type: "article",
+      publishedTime: makale.yayinTarihi,
+      authors: [`${makale.yazar.ad} ${makale.yazar.soyad}`],
+      images: makale.kapakGorseli ? [{ url: makale.kapakGorseli }] : undefined,
+      locale: "tr_TR",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: baslik,
+      description: aciklama,
+      images: makale.kapakGorseli ? [makale.kapakGorseli] : undefined,
+    },
   };
 }
 
@@ -44,8 +67,36 @@ export default async function MakaleSayfasi({
 
   const ilgili = await getIlgiliMakeleler(kategori, slug, 4);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: makale.baslik,
+    description: makale.ozet,
+    image: makale.kapakGorseli ? [makale.kapakGorseli] : undefined,
+    datePublished: makale.yayinTarihi,
+    dateModified: makale.yayinTarihi,
+    author: [
+      {
+        "@type": "Person",
+        name: `${makale.yazar.ad} ${makale.yazar.soyad}`,
+      },
+    ],
+    publisher: {
+      "@type": "Organization",
+      name: "EkonomiHaber",
+      logo: { "@type": "ImageObject", url: `${siteUrl}/favicon.ico` },
+    },
+    mainEntityOfPage: `${siteUrl}/${kategori}/${slug}`,
+    articleSection: kategoriAdi(kategori),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <MarketBar />
       <Navbar />
       <main className="max-w-[820px] mx-auto px-4 py-8">

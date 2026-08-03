@@ -12,9 +12,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const baslik = "EkonomiHaber - Türkiye'nin Finans ve Ekonomi Gazetesi";
+const aciklama =
+  "Borsa, döviz, altın, makroekonomik gelişmeler ve iş dünyasından son dakika haberleri.";
+
 export const metadata: Metadata = {
-  title: "EkonomiHaber - Türkiye'nin Finans ve Ekonomi Gazetesi",
-  description: "Borsa, döviz, altın, makroekonomik gelişmeler ve iş dünyasından son dakika haberleri.",
+  metadataBase: new URL(siteUrl),
+  title: { default: baslik, template: "%s | EkonomiHaber" },
+  description: aciklama,
+  openGraph: {
+    title: baslik,
+    description: aciklama,
+    url: siteUrl,
+    siteName: "EkonomiHaber",
+    locale: "tr_TR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: baslik,
+    description: aciklama,
+  },
 };
 
 export default function RootLayout({
