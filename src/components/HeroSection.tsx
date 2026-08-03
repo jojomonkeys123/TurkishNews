@@ -127,8 +127,8 @@ export default function HeroSection({
       <div className="max-w-[1400px] mx-auto px-4 py-5">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-3">
           {/* Slider */}
-          <div className="relative overflow-hidden rounded-xl shadow-lg shadow-slate-900/10 group">
-            <div className="relative aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[520px]">
+          <div className="relative overflow-hidden rounded-xl shadow-lg shadow-slate-900/10 group self-start">
+            <div className="relative aspect-[16/9] lg:aspect-auto lg:h-[600px]">
               <AnimatePresence mode="sync" initial={false}>
                 <motion.div
                   key={aktif}
@@ -153,18 +153,18 @@ export default function HeroSection({
                 </motion.div>
               </AnimatePresence>
 
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 pointer-events-none">
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 pointer-events-none">
                 <span
-                  className={`inline-block ${s.pill} text-white text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md mb-3 shadow-sm`}
+                  className={`inline-block ${s.pill} text-white text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md mb-4 shadow-sm`}
                 >
                   {s.category}
                 </span>
                 <Link href={s.href} className="pointer-events-auto">
-                  <h1 className="text-white text-2xl md:text-3xl font-bold leading-tight mb-2 max-w-[720px] drop-shadow-sm hover:text-slate-200 transition-colors">
+                  <h1 className="text-white text-2xl md:text-4xl font-bold leading-[1.12] tracking-tight mb-3 max-w-[760px] [text-wrap:balance] drop-shadow-sm hover:text-slate-200 transition-colors">
                     {s.headline}
                   </h1>
                 </Link>
-                <p className="text-slate-200 text-sm leading-relaxed hidden md:block mb-3 max-w-[620px] line-clamp-2">
+                <p className="text-slate-200/90 text-sm md:text-base leading-relaxed hidden md:block mb-4 max-w-[640px] line-clamp-2">
                   {s.summary}
                 </p>
                 <div className="flex items-center gap-3 text-slate-300 text-xs">
@@ -222,7 +222,7 @@ export default function HeroSection({
                 className="group/card img-zoom-parent card-press bg-white block rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
               >
                 <div className="flex flex-col h-full">
-                  <div className="relative overflow-hidden aspect-[16/9]">
+                  <div className="relative overflow-hidden aspect-[16/9] lg:h-[104px] lg:aspect-auto">
                     <Image
                       src={y.image}
                       alt={y.headline}
@@ -231,17 +231,17 @@ export default function HeroSection({
                       sizes="(max-width: 1024px) 50vw, 380px"
                     />
                   </div>
-                  <div className="p-3 flex-1">
+                  <div className="p-2.5 flex-1">
                     <span
                       className={`inline-block ${y.pill} text-white text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm`}
                     >
                       {y.category}
                     </span>
-                    <h3 className="text-slate-900 text-sm font-semibold leading-snug mt-1.5 line-clamp-2 group-hover/card:text-red-600 transition-colors">
+                    <h3 className="text-slate-900 text-[13px] font-semibold leading-snug mt-1.5 line-clamp-2 min-h-[2.6em] group-hover/card:text-red-600 transition-colors">
                       {y.headline}
                     </h3>
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px] mt-2">
-                      <Clock size={11} />
+                    <div className="flex items-center gap-1 text-slate-400 text-[10px] mt-1.5">
+                      <Clock size={10} />
                       <span>{y.time}</span>
                     </div>
                   </div>
