@@ -8,6 +8,7 @@
 import { createClient } from '@sanity/client'
 import Parser from 'rss-parser'
 import { kategoriYazariGetir } from './lib/yazar-esleme.mjs'
+import { gorselSorgulariOlustur, gorselId } from './lib/gorsel-anahtar.mjs'
 
 const sanity = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -20,7 +21,7 @@ const rss = new Parser({ timeout: 10000 })
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile'
 
-async function groqChat(messages, maxTokens = 1400) {
+async function groqChat(messages, maxTokens = 1400, deneme = 0) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -29,6 +30,14 @@ async function groqChat(messages, maxTokens = 1400) {
     },
     body: JSON.stringify({ model: GROQ_MODEL, messages, max_tokens: maxTokens, temperature: 0.5 }),
   })
+  if (res.status === 429 && deneme < 4) {
+    const metin = await res.text()
+    const bekleEslesme = metin.match(/try again in ([\d.]+)s/)
+    const bekleMs = bekleEslesme ? Math.ceil(parseFloat(bekleEslesme[1]) * 1000) + 500 : 8000
+    console.log(`  ⏳ Groq rate limit — ${(bekleMs / 1000).toFixed(1)}s bekleniyor...`)
+    await new Promise((r) => setTimeout(r, bekleMs))
+    return groqChat(messages, maxTokens, deneme + 1)
+  }
   if (!res.ok) throw new Error(`Groq error: ${res.status} ${await res.text()}`)
   const data = await res.json()
   return data.choices[0].message.content.trim()
@@ -88,15 +97,16 @@ async function haberleriTara() {
 
 // ── Groq ile önem skoru + kategori + özgün Türkçe makale (tek çağrıda) ───────
 async function skorlaVeYaz(orijinalBaslik, ozet) {
-  const cevap = await groqChat([
-    {
-      role: 'system',
-      content:
-        'YALNIZCA standart Türkiye Türkçesi kullanırsın. Başka hiçbir dilden (İngilizce, Çince, Endonezce/Malayca vb.) tek bir kelime veya karakter bile karıştırmazsın.',
-    },
-    {
-      role: 'user',
-      content: `Sen Anchor Medya'da çalışan bir editörsün. Bu haberi değerlendir ve gerekiyorsa makaleye dönüştür.
+  const cevap = await groqChat(
+    [
+      {
+        role: 'system',
+        content:
+          'YALNIZCA standart Türkiye Türkçesi kullanırsın. Başka hiçbir dilden (İngilizce, Çince, Endonezce/Malayca vb.) tek bir kelime veya karakter bile karıştırmazsın. Kıdemli bir muhabir gibi, derinlikli ve bilgilendirici yazarsın — yüzeysel/tekrar eden cümle kurmazsın.',
+      },
+      {
+        role: 'user',
+        content: `Sen Anchor Medya'da çalışan bir editörsün. Bu haberi değerlendir ve gerekiyorsa makaleye dönüştür.
 
 KAYNAK BAŞLIK: ${orijinalBaslik}
 BAĞLAM: ${ozet || ''}
@@ -106,7 +116,7 @@ PUAN: [1-10 arası tam sayı]
 KATEGORI: [${GECERLI_KATEGORILER.join('|')}]
 BASLIK: [Türkçe, 55-90 karakter, çarpıcı ama tık tuzağı değil]
 ---
-[Türkçe tam makale, en az 300 kelime, gerekirse "## Alt Başlık" ile bölümlenmiş, tarafsız gazetecilik dili]
+[Türkçe tam makale, 550-750 kelime, en az 1-2 "## Alt Başlık" ile bölümlenmiş (ör. "## Arka Plan", "## Gelişmeler"), olayın bağlamını ve olası etkilerini de işleyen tarafsız gazetecilik dili, kapanışta kısa bir özet paragrafı]
 
 PUANLAMA REHBERİ:
 9-10 = Savaş, terör saldırısı, piyasa çöküşü (%5+), doğal afet, TCMB acil faiz kararı
@@ -115,8 +125,10 @@ PUANLAMA REHBERİ:
 1-4 = Sıradan haber, yayınlanmaz
 
 Sadece istenen formatta cevap ver, başka hiçbir şey ekleme.`,
-    },
-  ])
+      },
+    ],
+    2000
+  )
 
   const satirlar = cevap.split('\n')
   const puanIdx = satirlar.findIndex((l) => l.startsWith('PUAN:'))
@@ -174,25 +186,27 @@ async function fetchPixabay(query) {
   return hits[0].largeImageURL
 }
 
-async function gorselBulVeYukle(baslik, dosyaAdi) {
-  const sorgu = baslik
-    .split(/\s+/)
-    .filter((w) => w.length > 5)
-    .slice(0, 3)
-    .join(' ') || 'türkiye haber'
+async function gorselBulVeYukle(kategori, baslik, dosyaAdi, kullanilanGorseller) {
+  const sorgular = gorselSorgulariOlustur(kategori, baslik)
 
-  for (const kaynak of [fetchUnsplash, fetchPexels, fetchPixabay]) {
-    try {
-      const url = await kaynak(sorgu)
-      const res = await fetch(url)
-      const buffer = await res.arrayBuffer()
-      const asset = await sanity.assets.upload('image', Buffer.from(buffer), {
-        filename: `${dosyaAdi}.jpg`,
-        contentType: 'image/jpeg',
-      })
-      return asset._id
-    } catch {
-      // sıradaki kaynağa geç
+  for (const sorgu of sorgular) {
+    for (const kaynak of [fetchUnsplash, fetchPexels, fetchPixabay]) {
+      try {
+        const url = await kaynak(sorgu)
+        const id = gorselId(url)
+        if (kullanilanGorseller.has(id)) continue
+        kullanilanGorseller.add(id)
+
+        const res = await fetch(url)
+        const buffer = await res.arrayBuffer()
+        const asset = await sanity.assets.upload('image', Buffer.from(buffer), {
+          filename: `${dosyaAdi}.jpg`,
+          contentType: 'image/jpeg',
+        })
+        return asset._id
+      } catch {
+        // sıradaki kaynağa/sorguya geç
+      }
     }
   }
   return null
@@ -214,6 +228,7 @@ async function main() {
   console.log(`${haberler.length} güncel haber bulundu, önem skoru hesaplanıyor...\n`)
 
   let yayinlanan = 0
+  const kullanilanGorseller = new Set()
 
   for (const haber of haberler.slice(0, 20)) {
     const orijinalBaslik = haber.title?.replace(/<[^>]+>/g, '').trim()
@@ -241,7 +256,7 @@ async function main() {
     console.log(`  🔴 ${puan}/10 — SON DAKİKA: ${baslik.slice(0, 60)}`)
 
     const yazarId = await kategoriYazariGetir(sanity, kategori)
-    const assetId = await gorselBulVeYukle(baslik, slug)
+    const assetId = await gorselBulVeYukle(kategori, baslik, slug, kullanilanGorseller)
     const ozetHam = icerik.replace(/^##.+$/gm, '').replace(/\n+/g, ' ').trim().slice(0, 200)
     const ozet = ozetHam.slice(0, ozetHam.lastIndexOf(' ')) + '…'
 

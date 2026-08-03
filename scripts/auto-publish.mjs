@@ -8,6 +8,7 @@
 import { createClient } from '@sanity/client'
 import Parser from 'rss-parser'
 import { kategoriYazariGetir } from './lib/yazar-esleme.mjs'
+import { gorselSorgulariOlustur, gorselId } from './lib/gorsel-anahtar.mjs'
 
 // ── Clients ──────────────────────────────────────────────────────────────────
 const sanity = createClient({
@@ -21,7 +22,7 @@ const rss = new Parser({ timeout: 10000 })
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile'
 
-async function groqChat(messages, maxTokens = 1400) {
+async function groqChat(messages, maxTokens = 1400, deneme = 0) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -35,6 +36,14 @@ async function groqChat(messages, maxTokens = 1400) {
       temperature: 0.6,
     }),
   })
+  if (res.status === 429 && deneme < 4) {
+    const metin = await res.text()
+    const bekleEslesme = metin.match(/try again in ([\d.]+)s/)
+    const bekleMs = bekleEslesme ? Math.ceil(parseFloat(bekleEslesme[1]) * 1000) + 500 : 8000
+    console.log(`  ⏳ Groq rate limit — ${(bekleMs / 1000).toFixed(1)}s bekleniyor...`)
+    await new Promise((r) => setTimeout(r, bekleMs))
+    return groqChat(messages, maxTokens, deneme + 1)
+  }
   if (!res.ok) throw new Error(`Groq error: ${res.status} ${await res.text()}`)
   const data = await res.json()
   return data.choices[0].message.content.trim()
@@ -66,21 +75,26 @@ const FONTI = {
 
 const TOPLAM = parseInt(process.env.ARTICLE_COUNT || '8')
 
+const TUM_KATEGORILER = [
+  'ekonomi',
+  'piyasalar',
+  'gundem',
+  'is-dunyasi',
+  'yasam',
+  'politika',
+  'teknoloji',
+  'kuresel',
+]
+
+// Kategoriler arasında dönüşümlü dağıtım yapar — toplam sayı ne olursa olsun
+// (küçük ya da büyük) her kategori dengeli pay alır, sabit bir tavana takılmaz.
 function makalePlani(toplam) {
-  if (toplam <= 3) return { ekonomi: 1, gundem: 1, yasam: 1 }
-  if (toplam <= 6) return { ekonomi: 2, piyasalar: 1, gundem: 1, yasam: 1, kuresel: 1 }
-  if (toplam <= 8)
-    return { ekonomi: 2, piyasalar: 1, gundem: 1, 'is-dunyasi': 1, yasam: 1, teknoloji: 1, kuresel: 1 }
-  return {
-    ekonomi: 2,
-    piyasalar: 1,
-    gundem: 1,
-    'is-dunyasi': 1,
-    yasam: 1,
-    politika: 1,
-    teknoloji: 1,
-    kuresel: 1,
+  const plan = {}
+  for (let i = 0; i < toplam; i++) {
+    const kategori = TUM_KATEGORILER[i % TUM_KATEGORILER.length]
+    plan[kategori] = (plan[kategori] || 0) + 1
   }
+  return plan
 }
 const PLAN = makalePlani(TOPLAM)
 
@@ -218,25 +232,30 @@ SADECE "EVET" ya da "HAYIR" yaz.`,
 
 // ── Groq ile özgün Türkçe makale yaz ─────────────────────────────────────────
 async function makaleYaz(orijinalBaslik, ozetRSS, kategori) {
-  const sistemMesaji = `Sen Anchor Medya için yazan profesyonel bir muhabirsin. Tarafsız, net ve gazetecilik diliyle YALNIZCA standart Türkiye Türkçesi kullanarak yazarsın. Başka hiçbir dilden (İngilizce, Endonezce/Malayca, Vietnamca vb.) tek bir kelime bile karıştırmazsın — metnin tamamı sözlük anlamıyla doğru, temiz Türkçe olmalı. Yorum, tavsiye veya spekülasyon yapmazsın. Sağlanan bilgilerin dışına çıkmazsın.`
+  const sistemMesaji = `Sen Anchor Medya için yazan kıdemli bir muhabirsin. Tarafsız, net ve gazetecilik diliyle YALNIZCA standart Türkiye Türkçesi kullanarak yazarsın. Başka hiçbir dilden (İngilizce, Endonezce/Malayca, Vietnamca vb.) tek bir kelime bile karıştırmazsın — metnin tamamı sözlük anlamıyla doğru, temiz Türkçe olmalı. Yorum, tavsiye veya spekülasyon yapmazsın. Sağlanan bilgilerin dışına çıkmazsın. Yüzeysel/tekrar eden cümleler kurmazsın; her paragraf yeni bir bilgi, arka plan detayı veya bağlam ekler. Premium bir haber gazetesinin editoryal standardında, derinlikli ve bilgilendirici yazarsın.`
 
   const kullaniciMesaji = `KATEGORİ: ${kategori}
 KAYNAK BAŞLIK: ${orijinalBaslik}
 BAĞLAM: ${ozetRSS || ''}
 
-Aşağıdaki formatta özgün bir haber makalesi yaz:
+Aşağıdaki formatta özgün, derinlikli bir haber makalesi yaz:
 
 1. satır: BAŞLIK (55-90 karakter, net ve açıklayıcı, tık tuzağı değil)
 [boş satır]
 2. GİRİŞ paragrafı: ne oldu + nerede + ne zaman + varsa önemli rakam
 [boş satır]
-3-5 gövde paragrafı, gerekirse "## Alt Başlık" ile ayrılmış
-Toplam 350-500 kelime, tamamen Türkçe, tarafsız ton.`
+5-8 gövde paragrafı, en az 2 tanesi "## Alt Başlık" ile ayrılmış (örn. "## Arka Plan", "## Uzman Görüşü / Etkiler", "## Sonraki Adımlar" gibi haberin konusuna uygun başlıklar). Her alt başlık altında en az 2 paragraf olsun.
+Gövdede şunları dengeli şekilde işle: olayın arka planı/bağlamı, ilgili taraflar ve açıklamaları, sayısal veriler/karşılaştırmalar (varsa), olası etkiler veya sonraki gelişmeler.
+Son paragraf bir kapanış/özet niteliğinde olsun, yeni bilgi tekrarlamadan konuyu toparlasın.
+Toplam 700-1000 kelime, tamamen Türkçe, tarafsız ve akıcı ton. Kısa/yüzeysel yazma — her paragraf en az 3-4 cümle olsun.`
 
-  const cevap = await groqChat([
-    { role: 'system', content: sistemMesaji },
-    { role: 'user', content: kullaniciMesaji },
-  ])
+  const cevap = await groqChat(
+    [
+      { role: 'system', content: sistemMesaji },
+      { role: 'user', content: kullaniciMesaji },
+    ],
+    1800
+  )
 
   const satirlar = cevap.split('\n').filter((l) => l.trim())
   const baslik = satirlar[0].replace(/^#+\s*/, '').trim()
@@ -246,17 +265,6 @@ Toplam 350-500 kelime, tamamen Türkçe, tarafsız ton.`
 }
 
 // ── Görsel bulma (ücretsiz 3 katman: Unsplash → Pexels → Pixabay) ────────────
-const KATEGORI_GORSEL_HAVUZU = {
-  piyasalar: ['stock exchange trading floor', 'financial chart screen', 'currency exchange money'],
-  ekonomi: ['economy inflation chart', 'central bank building', 'business economics data'],
-  gundem: ['istanbul city street life', 'turkey national flag', 'crowd people city square'],
-  'is-dunyasi': ['corporate office meeting', 'business handshake deal', 'company headquarters building'],
-  yasam: ['healthy lifestyle wellness', 'family home life', 'doctor healthcare hospital'],
-  politika: ['government building parliament', 'politics meeting hall', 'diplomacy summit'],
-  teknoloji: ['technology startup office', 'artificial intelligence data center', 'software developer coding'],
-  kuresel: ['global economy world map', 'international summit leaders', 'world trade shipping port'],
-}
-
 function turkceTemizle(metin) {
   const harfler = { ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', İ: 'I' }
   return metin.replace(/[çğıöşüİ]/g, (c) => harfler[c] || c)
@@ -292,15 +300,20 @@ async function fetchPixabay(query) {
   return hits[Math.floor(Math.random() * Math.min(hits.length, 3))].largeImageURL
 }
 
-async function gorselBul(kategori) {
-  const havuz = KATEGORI_GORSEL_HAVUZU[kategori] || KATEGORI_GORSEL_HAVUZU.ekonomi
-  const sorgu = turkceTemizle(havuz[Math.floor(Math.random() * havuz.length)])
+async function gorselBul(kategori, baslik, kullanilanGorseller) {
+  const sorgular = gorselSorgulariOlustur(kategori, baslik).map(turkceTemizle)
 
-  for (const kaynak of [fetchUnsplash, fetchPexels, fetchPixabay]) {
-    try {
-      return await kaynak(sorgu)
-    } catch {
-      // sıradaki kaynağa geç
+  for (const sorgu of sorgular) {
+    for (const kaynak of [fetchUnsplash, fetchPexels, fetchPixabay]) {
+      try {
+        const url = await kaynak(sorgu)
+        const id = gorselId(url)
+        if (kullanilanGorseller.has(id)) continue
+        kullanilanGorseller.add(id)
+        return url
+      } catch {
+        // sıradaki kaynağa geç
+      }
     }
   }
   return null
@@ -326,6 +339,7 @@ async function main() {
 
   console.log(`🚀 Anchor Medya — ${TOPLAM} makale hedefleniyor\n`)
   let toplam = 0
+  const kullanilanGorseller = new Set() // aynı run içinde görsel tekrarını önler
 
   for (const [kategori, adet] of Object.entries(PLAN)) {
     console.log(`\n📰 ${kategori.toUpperCase()} (${adet} makale)`)
@@ -369,7 +383,7 @@ async function main() {
 
         let kapakGorseli
         try {
-          const gorselUrl = await gorselBul(kategori)
+          const gorselUrl = await gorselBul(kategori, baslik, kullanilanGorseller)
           if (gorselUrl) {
             console.log(`  🖼️  Görsel bulundu, yükleniyor...`)
             const assetId = await gorselYukle(gorselUrl, slug)
@@ -379,6 +393,36 @@ async function main() {
           }
         } catch (gorselErr) {
           console.warn(`  ⚠️  Görsel yüklenemedi: ${gorselErr.message}`)
+        }
+
+        let icerikBloklari = metniBloklaraCevir(icerik)
+
+        // Öncelikli/uzun makalelerin bir kısmına metin içi ikinci bir görsel ekle
+        if (kapakGorseli && oncelik >= 7 && Math.random() < 0.5) {
+          try {
+            const ikinciGorselUrl = await gorselBul(kategori, baslik, kullanilanGorseller)
+            if (ikinciGorselUrl) {
+              const ikinciAssetId = await gorselYukle(ikinciGorselUrl, `${slug}-2`)
+              const gorselBlok = {
+                _type: 'image',
+                _key: key(),
+                asset: { _type: 'reference', _ref: ikinciAssetId },
+              }
+              const ilkH2Index = icerikBloklari.findIndex((b) => b.style === 'h2')
+              const eklemeNoktasi =
+                ilkH2Index >= 0
+                  ? Math.min(ilkH2Index + 2, icerikBloklari.length)
+                  : Math.floor(icerikBloklari.length / 2)
+              icerikBloklari = [
+                ...icerikBloklari.slice(0, eklemeNoktasi),
+                gorselBlok,
+                ...icerikBloklari.slice(eklemeNoktasi),
+              ]
+              console.log(`  🖼️  İkinci görsel eklendi (metin içi)`)
+            }
+          } catch (ikinciGorselErr) {
+            console.warn(`  ⚠️  İkinci görsel eklenemedi: ${ikinciGorselErr.message}`)
+          }
         }
 
         await sanity.create({
@@ -391,7 +435,7 @@ async function main() {
           ...(kapakGorseli && { kapakGorseli }),
           ozet,
           metaAciklama: ozet.slice(0, 160),
-          icerik: metniBloklaraCevir(icerik),
+          icerik: icerikBloklari,
           etiketler: [kategori],
           finansalIcerik: ['ekonomi', 'piyasalar'].includes(kategori),
           oncelik,

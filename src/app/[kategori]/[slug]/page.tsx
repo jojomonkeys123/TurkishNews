@@ -3,13 +3,31 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Clock, WarningCircle } from "@phosphor-icons/react/dist/ssr";
-import { PortableText } from "@portabletext/react";
+import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import Navbar from "@/components/Navbar";
 import MarketBar from "@/components/MarketBar";
 import Footer from "@/components/Footer";
 import { getMakale, getIlgiliMakeleler, getTumSlug } from "@/lib/sanity";
 import { KATEGORILER, kategoriAdi, formatTarih } from "@/lib/kategoriler";
 import { KATEGORI_RENK } from "@/lib/kategoriRenkleri";
+
+const portableTextBilesenleri: PortableTextComponents = {
+  types: {
+    image: ({ value }: { value: { url?: string; alt?: string; caption?: string } }) =>
+      value?.url ? (
+        <figure className="my-6">
+          <div className="relative w-full aspect-[16/9] overflow-hidden rounded">
+            <Image src={value.url} alt={value.alt || ""} fill className="object-cover" />
+          </div>
+          {value.caption && (
+            <figcaption className="text-xs text-slate-500 mt-2 text-center">
+              {value.caption}
+            </figcaption>
+          )}
+        </figure>
+      ) : null,
+  },
+};
 
 export async function generateStaticParams() {
   const slugs = await getTumSlug();
@@ -127,7 +145,7 @@ export default async function MakaleSayfasi({
         )}
 
         <article className="prose prose-slate max-w-none prose-headings:font-bold prose-a:text-red-600">
-          <PortableText value={makale.icerik} />
+          <PortableText value={makale.icerik} components={portableTextBilesenleri} />
         </article>
 
         {makale.finansalIcerik && (

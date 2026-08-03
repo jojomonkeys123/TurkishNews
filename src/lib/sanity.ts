@@ -99,7 +99,12 @@ export const getMakale = cache(
         yazar->{ad, soyad, "slug": slug.current, bio, "foto": foto.asset->url},
         yayinTarihi,
         "kapakGorseli": kapakGorseli.asset->url,
-        ozet, icerik, etiketler, finansalIcerik, sonDakika,
+        ozet,
+        icerik[]{
+          ...,
+          _type == "image" => { ..., "url": asset->url }
+        },
+        etiketler, finansalIcerik, sonDakika,
         metaBaslik, metaAciklama
       }`,
       { kategori, slug },
