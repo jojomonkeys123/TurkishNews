@@ -6,15 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "publish:auto": "node scripts/auto-publish.mjs",
+    "publish:breaking": "node scripts/breaking-news.mjs",
+    "publish:newsletter": "node scripts/weekly-newsletter.mjs"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@portabletext/react": "^7.0.1",
+    "@sanity/client": "^7.26.0",
+    "@sanity/image-url": "^2.1.1",
+    "@supabase/supabase-js": "^2.111.0",
+    "motion": "^12.40.0",
     "next": "16.2.7",
+    "next-sanity": "^13.2.3",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "resend": "^6.18.1",
+    "rss-parser": "^3.13.0",
+    "sanity": "^6.8.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

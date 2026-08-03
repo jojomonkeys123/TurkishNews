@@ -1,8 +1,19 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f9fa;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #dc2626;
+  --accent-hover: #b91c1c;
+  --positive: #16a34a;
+  --negative: #dc2626;
+  --market-bg: #0f172a;
+  --market-text: #e2e8f0;
 }
 
 @theme inline {
@@ -12,15 +23,91 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Image zoom — gated to real pointer devices */
+.img-zoom {
+  transition: transform 300ms var(--ease-out);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .img-zoom-parent:hover .img-zoom {
+    transform: scale(1.04);
   }
+}
+
+/* Card press feedback */
+.card-press {
+  transition: transform 120ms ease-out;
+}
+
+.card-press:active {
+  transform: scale(0.99);
+}
+
+/* Subscribe button */
+.btn-subscribe {
+  transition: background-color 150ms ease-out, transform 130ms ease-out;
+}
+
+.btn-subscribe:active {
+  transform: scale(0.96);
+}
+
+/* Icon button press */
+.btn-icon {
+  transition: color 150ms ease-out, transform 130ms ease-out;
+}
+
+.btn-icon:active {
+  transform: scale(0.9);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  animation: ticker 40s linear infinite;
+  will-change: transform;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
