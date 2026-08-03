@@ -41,8 +41,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="text-xl font-bold mb-3">
-              <span className="text-red-500">Ekonomi</span>
-              <span className="text-white">Haber</span>
+              <span className="text-red-500">Anchor</span>
+              <span className="text-white">Medya</span>
             </div>
             <p className="text-sm text-slate-500 leading-relaxed max-w-[220px]">
               Türkiye'nin ekonomi ve finans gündemine tarafsız, bağımsız bakış.
