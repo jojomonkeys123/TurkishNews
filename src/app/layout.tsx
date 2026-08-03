@@ -13,19 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const baslik = "EkonomiHaber - Türkiye'nin Finans ve Ekonomi Gazetesi";
+const baslik = "Anchor Medya - Türkiye'nin Finans ve Ekonomi Gazetesi";
 const aciklama =
   "Borsa, döviz, altın, makroekonomik gelişmeler ve iş dünyasından son dakika haberleri.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: baslik, template: "%s | EkonomiHaber" },
+  title: { default: baslik, template: "%s | Anchor Medya" },
   description: aciklama,
   openGraph: {
     title: baslik,
     description: aciklama,
     url: siteUrl,
-    siteName: "EkonomiHaber",
+    siteName: "Anchor Medya",
     locale: "tr_TR",
     type: "website",
   },

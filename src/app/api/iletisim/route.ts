@@ -15,8 +15,8 @@ export async function POST(req: Request) {
 
   try {
     await resend.emails.send({
-      from: process.env.RESEND_FROM || "EkonomiHaber <bulten@ekonomihaber.com>",
-      to: process.env.CONTACT_EMAIL || "iletisim@ekonomihaber.com",
+      from: process.env.RESEND_FROM || "Anchor Medya <bulten@anchormedya.com>",
+      to: process.env.CONTACT_EMAIL || "iletisim@anchormedya.com",
       replyTo: email,
       subject: `İletişim formu: ${ad}`,
       text: `Gönderen: ${ad} <${email}>\n\n${mesaj}`,

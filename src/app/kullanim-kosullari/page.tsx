@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import StaticSayfa from "@/components/StaticSayfa";
 
 export const metadata: Metadata = {
-  title: "Kullanım Koşulları | EkonomiHaber",
-  description: "EkonomiHaber web sitesi kullanım koşulları.",
+  title: "Kullanım Koşulları | Anchor Medya",
+  description: "Anchor Medya web sitesi kullanım koşulları.",
 };
 
 export default function KullanimKosullariSayfasi() {
   return (
     <StaticSayfa baslik="Kullanım Koşulları" guncellemeTarihi="2 Ağustos 2026">
       <p>
-        EkonomiHaber web sitesini (&quot;site&quot;) kullanarak aşağıdaki koşulları kabul
+        Anchor Medya web sitesini (&quot;site&quot;) kullanarak aşağıdaki koşulları kabul
         etmiş sayılırsınız. Lütfen siteyi kullanmadan önce bu koşulları dikkatlice
         okuyun.
       </p>
@@ -27,7 +27,7 @@ export default function KullanimKosullariSayfasi() {
         Sitede yayınlanan piyasa verileri, döviz kurları, hisse senedi, altın ve emtia
         fiyatları ile ekonomi haberleri yalnızca genel bilgilendirme amaçlıdır ve
         yatırım tavsiyesi niteliği taşımaz. Bu bilgilere dayanarak alınan yatırım
-        kararlarından EkonomiHaber sorumlu tutulamaz.
+        kararlarından Anchor Medya sorumlu tutulamaz.
       </p>
 
       <h2>İçeriklerin Doğruluğu</h2>
@@ -40,9 +40,9 @@ export default function KullanimKosullariSayfasi() {
 
       <h2>Sorumluluk Sınırlaması</h2>
       <p>
-        EkonomiHaber, sitenin kesintisiz veya hatasız çalışacağını garanti etmez.
+        Anchor Medya, sitenin kesintisiz veya hatasız çalışacağını garanti etmez.
         Sitenin kullanımından doğabilecek doğrudan veya dolaylı zararlardan
-        EkonomiHaber sorumlu tutulamaz.
+        Anchor Medya sorumlu tutulamaz.
       </p>
 
       <h2>Değişiklikler</h2>

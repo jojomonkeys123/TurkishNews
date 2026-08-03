@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import StaticSayfa from "@/components/StaticSayfa";
 
 export const metadata: Metadata = {
-  title: "KVKK Aydınlatma Metni | EkonomiHaber",
+  title: "KVKK Aydınlatma Metni | Anchor Medya",
   description: "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında aydınlatma metni.",
 };
 
@@ -11,7 +11,7 @@ export default function KvkkSayfasi() {
     <StaticSayfa baslik="KVKK Aydınlatma Metni" guncellemeTarihi="2 Ağustos 2026">
       <p>
         6698 sayılı Kişisel Verilerin Korunması Kanunu (&quot;KVKK&quot;) uyarınca, veri
-        sorumlusu sıfatıyla EkonomiHaber olarak, kişisel verilerinizin işlenmesine
+        sorumlusu sıfatıyla Anchor Medya olarak, kişisel verilerinizin işlenmesine
         ilişkin sizleri bilgilendirmek isteriz.
       </p>
 

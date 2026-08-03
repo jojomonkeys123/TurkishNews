@@ -1,5 +1,5 @@
 /**
- * EkonomiHaber — Haftalık bülten scripti
+ * Anchor Medya — Haftalık bülten scripti
  * Her Pazartesi 09:00'da çalışır, geçen haftanın öne çıkan haberlerini Resend üzerinden gönderir.
  * Kullanım: node scripts/weekly-newsletter.mjs
  * Gerekli: Resend hesabında bir Audience (Kitle) oluşturup RESEND_AUDIENCE_ID'yi .env.local'e ekle.
@@ -17,7 +17,7 @@ const sanity = createClient({
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID || ''
-const FROM = process.env.RESEND_FROM || 'EkonomiHaber <bulten@ekonomihaber.com>'
+const FROM = process.env.RESEND_FROM || 'Anchor Medya <bulten@anchormedya.com>'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 const KATEGORI_ETIKET = {
@@ -131,7 +131,7 @@ function emailHtmlOlustur(makaleler, gruplar) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EkonomiHaber — Haftalık Bülten</title>
+  <title>Anchor Medya — Haftalık Bülten</title>
 </head>
 <body style="margin: 0; padding: 0; background: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background: #f4f4f4; padding: 32px 16px;">
@@ -142,7 +142,7 @@ function emailHtmlOlustur(makaleler, gruplar) {
           <tr>
             <td style="background: #0f172a; padding: 28px 32px; border-radius: 12px 12px 0 0; text-align: center;">
               <p style="margin: 0; font-size: 32px; font-weight: 900; color: white; letter-spacing: -1px;">
-                <span style="color:#ef4444;">Ekonomi</span>Haber
+                <span style="color:#ef4444;">Anchor</span>Medya
               </p>
               <p style="margin: 8px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px;">Haftalık Bülten · ${haftaStr}</p>
               <div style="margin-top: 12px; display: inline-block;">
@@ -155,7 +155,7 @@ function emailHtmlOlustur(makaleler, gruplar) {
             <td style="background: white; padding: 32px;">
 
               <p style="margin: 0 0 24px 0; font-size: 15px; color: #444; line-height: 1.6;">
-                Merhaba! Bu geçen hafta <strong>EkonomiHaber</strong>'de öne çıkan haberler.
+                Merhaba! Bu geçen hafta <strong>Anchor Medya</strong>'da öne çıkan haberler.
               </p>
 
               <p style="margin: 0 0 20px 0; font-size: 13px; font-weight: 800; color: #111; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 3px solid #111; padding-bottom: 10px;">
@@ -176,7 +176,7 @@ function emailHtmlOlustur(makaleler, gruplar) {
                 <tr>
                   <td align="center" style="padding: 16px 0 8px 0;">
                     <a href="${SITE_URL}" style="display: inline-block; background: #dc2626; color: white; font-size: 14px; font-weight: 700; padding: 14px 32px; border-radius: 8px; text-decoration: none;">
-                      EkonomiHaber'de Devamını Oku →
+                      Anchor Medya'da Devamını Oku →
                     </a>
                   </td>
                 </tr>
@@ -188,7 +188,7 @@ function emailHtmlOlustur(makaleler, gruplar) {
           <tr>
             <td style="background: #f8f8f8; padding: 20px 32px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e5e5; text-align: center;">
               <p style="margin: 0; font-size: 12px; color: #999; line-height: 1.6;">
-                Bu e-postayı ekonomihaber.com üzerinden bültene abone olduğunuz için alıyorsunuz.<br>
+                Bu e-postayı anchormedya.com üzerinden bültene abone olduğunuz için alıyorsunuz.<br>
                 <a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color: #999;">Abonelikten çık</a>
               </p>
             </td>
@@ -226,7 +226,7 @@ async function main() {
   const { data: broadcast, error: bcError } = await resend.broadcasts.create({
     audienceId: AUDIENCE_ID,
     from: FROM,
-    subject: `📰 EkonomiHaber — ${haftaStr} Haftası Öne Çıkanlar`,
+    subject: `📰 Anchor Medya — ${haftaStr} Haftası Öne Çıkanlar`,
     html,
   })
 

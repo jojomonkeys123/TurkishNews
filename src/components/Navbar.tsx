@@ -19,8 +19,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 gap-6">
           <Link href="/" className="shrink-0">
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-red-600">Ekonomi</span>
-              <span className="text-slate-900">Haber</span>
+              <span className="text-red-600">Anchor</span>
+              <span className="text-slate-900">Medya</span>
             </span>
           </Link>
 

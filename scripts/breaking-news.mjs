@@ -1,5 +1,5 @@
 /**
- * EkonomiHaber — Saatlik son dakika taraması
+ * Anchor Medya — Saatlik son dakika taraması
  * RSS (ücretsiz) → Groq önem skoru (ücretsiz) → sadece 7+ puan alanlar "sonDakika" olarak yayınlanır.
  * Kullanım: node scripts/breaking-news.mjs
  * (Vercel Cron ile saatte bir tetiklenmesi önerilir.)
@@ -96,7 +96,7 @@ async function skorlaVeYaz(orijinalBaslik, ozet) {
     },
     {
       role: 'user',
-      content: `Sen EkonomiHaber'de çalışan bir editörsün. Bu haberi değerlendir ve gerekiyorsa makaleye dönüştür.
+      content: `Sen Anchor Medya'da çalışan bir editörsün. Bu haberi değerlendir ve gerekiyorsa makaleye dönüştür.
 
 KAYNAK BAŞLIK: ${orijinalBaslik}
 BAĞLAM: ${ozet || ''}

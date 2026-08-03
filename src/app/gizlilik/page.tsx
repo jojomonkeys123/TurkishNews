@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import StaticSayfa from "@/components/StaticSayfa";
 
 export const metadata: Metadata = {
-  title: "Gizlilik Politikası | EkonomiHaber",
-  description: "EkonomiHaber gizlilik politikası ve çerez kullanımı hakkında bilgi.",
+  title: "Gizlilik Politikası | Anchor Medya",
+  description: "Anchor Medya gizlilik politikası ve çerez kullanımı hakkında bilgi.",
 };
 
 export default function GizlilikSayfasi() {
   return (
     <StaticSayfa baslik="Gizlilik Politikası" guncellemeTarihi="2 Ağustos 2026">
       <p>
-        EkonomiHaber (&quot;biz&quot;, &quot;site&quot;) olarak kullanıcılarımızın
+        Anchor Medya (&quot;biz&quot;, &quot;site&quot;) olarak kullanıcılarımızın
         gizliliğine önem veriyoruz. Bu politika, sitemizi ziyaret ettiğinizde hangi
         verilerin toplandığını, nasıl kullanıldığını ve haklarınızın neler olduğunu
         açıklar.

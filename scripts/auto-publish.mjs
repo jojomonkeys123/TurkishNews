@@ -1,5 +1,5 @@
 /**
- * EkonomiHaber — Otomatik makale yayınlama scripti
+ * Anchor Medya — Otomatik makale yayınlama scripti
  * Tamamen ücretsiz kaynaklarla çalışır: RSS (key gerekmez) + Groq API (ücretsiz) + Sanity.
  * Kullanım: node scripts/auto-publish.mjs
  * (Vercel Cron ile günde 3 kez tetiklenmesi önerilir: 08:00, 13:00, 19:00 TR saati)
@@ -218,7 +218,7 @@ SADECE "EVET" ya da "HAYIR" yaz.`,
 
 // ── Groq ile özgün Türkçe makale yaz ─────────────────────────────────────────
 async function makaleYaz(orijinalBaslik, ozetRSS, kategori) {
-  const sistemMesaji = `Sen EkonomiHaber için yazan profesyonel bir muhabirsin. Tarafsız, net ve gazetecilik diliyle YALNIZCA standart Türkiye Türkçesi kullanarak yazarsın. Başka hiçbir dilden (İngilizce, Endonezce/Malayca, Vietnamca vb.) tek bir kelime bile karıştırmazsın — metnin tamamı sözlük anlamıyla doğru, temiz Türkçe olmalı. Yorum, tavsiye veya spekülasyon yapmazsın. Sağlanan bilgilerin dışına çıkmazsın.`
+  const sistemMesaji = `Sen Anchor Medya için yazan profesyonel bir muhabirsin. Tarafsız, net ve gazetecilik diliyle YALNIZCA standart Türkiye Türkçesi kullanarak yazarsın. Başka hiçbir dilden (İngilizce, Endonezce/Malayca, Vietnamca vb.) tek bir kelime bile karıştırmazsın — metnin tamamı sözlük anlamıyla doğru, temiz Türkçe olmalı. Yorum, tavsiye veya spekülasyon yapmazsın. Sağlanan bilgilerin dışına çıkmazsın.`
 
   const kullaniciMesaji = `KATEGORİ: ${kategori}
 KAYNAK BAŞLIK: ${orijinalBaslik}
@@ -324,7 +324,7 @@ async function main() {
     process.exit(1)
   }
 
-  console.log(`🚀 EkonomiHaber — ${TOPLAM} makale hedefleniyor\n`)
+  console.log(`🚀 Anchor Medya — ${TOPLAM} makale hedefleniyor\n`)
   let toplam = 0
 
   for (const [kategori, adet] of Object.entries(PLAN)) {

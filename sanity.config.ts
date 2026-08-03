@@ -7,7 +7,7 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
 
 export default defineConfig({
   name: 'ekonomi-haber',
-  title: 'EkonomiHaber CMS',
+  title: 'Anchor Medya CMS',
   projectId,
   dataset,
   plugins: [

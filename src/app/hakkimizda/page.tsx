@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import StaticSayfa from "@/components/StaticSayfa";
 
 export const metadata: Metadata = {
-  title: "Hakkımızda | EkonomiHaber",
-  description: "EkonomiHaber kimdir, nasıl çalışır, editoryal yaklaşımı nedir?",
+  title: "Hakkımızda | Anchor Medya",
+  description: "Anchor Medya kimdir, nasıl çalışır, editoryal yaklaşımı nedir?",
 };
 
 export default function HakkimizdaSayfasi() {
   return (
     <StaticSayfa baslik="Hakkımızda">
       <p>
-        EkonomiHaber, Türkiye&apos;nin ekonomi, finans, gündem, iş dünyası ve teknoloji
+        Anchor Medya, Türkiye&apos;nin ekonomi, finans, gündem, iş dünyası ve teknoloji
         alanlarındaki gelişmelerini takip eden dijital bir haber platformudur. Amacımız,
         okuyucularımıza güncel piyasa verilerini ve haberleri hızlı, anlaşılır ve tarafsız
         bir dille sunmaktır.
@@ -18,7 +18,7 @@ export default function HakkimizdaSayfasi() {
 
       <h2>Editoryal Yaklaşımımız</h2>
       <p>
-        EkonomiHaber&apos;deki haber içerikleri, güvenilir haber ajansları ve kamuya açık
+        Anchor Medya&apos;daki haber içerikleri, güvenilir haber ajansları ve kamuya açık
         kaynaklardan derlenen bilgiler editoryal ekibimiz tarafından özgün şekilde
         hazırlanmaktadır. Hatalı veya güncelliğini yitirmiş bir bilgi fark ederseniz{" "}
         <a href="/iletisim">bizimle iletişime geçerek</a> bildirebilirsiniz.

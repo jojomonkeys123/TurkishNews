@@ -84,7 +84,7 @@ export default async function MakaleSayfasi({
     ],
     publisher: {
       "@type": "Organization",
-      name: "EkonomiHaber",
+      name: "Anchor Medya",
       logo: { "@type": "ImageObject", url: `${siteUrl}/favicon.ico` },
     },
     mainEntityOfPage: `${siteUrl}/${kategori}/${slug}`,

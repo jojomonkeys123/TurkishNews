@@ -67,7 +67,7 @@ export default function Footer() {
         </div>
         <div className="border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-slate-600">
-            2026 EkonomiHaber. Tüm hakları saklıdır.
+            2026 Anchor Medya. Tüm hakları saklıdır.
           </p>
           <div className="flex items-center gap-4">
             <Link href="/gizlilik" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Gizlilik</Link>
