@@ -16,8 +16,8 @@ import {
 export default async function Home() {
   const [mansetAdaylari, ekonomiHaberleri, sonMakaleler, sonDakika] = await Promise.all([
     getMansetMakaleler(20),
-    getKategoriMakeleri("ekonomi", 3),
-    getSonMakaleler(6),
+    getKategoriMakeleri("ekonomi", 6),
+    getSonMakaleler(18),
     getSonDakikaMakaleler(6),
   ]);
 
@@ -29,6 +29,8 @@ export default async function Home() {
   const slaytlar = gorselliOnce.slice(0, 10);
   const digerleri = gorselliOnce.slice(10, 14);
   const baslikliste = (sonDakika.length > 0 ? sonDakika : sonMakaleler).map((m) => m.baslik);
+  const oneCikanlar = sonMakaleler.slice(0, 6);
+  const digerHaberler = sonMakaleler.slice(6, 12);
 
   return (
     <>
@@ -36,9 +38,9 @@ export default async function Home() {
       <Navbar />
       <BreakingTicker baslikliste={baslikliste} />
       <HeroSection slaytlar={slaytlar} digerleri={digerleri} />
-      <NewsGrid ekonomiHaberleri={ekonomiHaberleri} oneCikanlar={sonMakaleler} />
+      <NewsGrid ekonomiHaberleri={ekonomiHaberleri} oneCikanlar={oneCikanlar} />
       <MarketTable />
-      <MoreNews />
+      <MoreNews digerHaberler={digerHaberler} />
       <Footer />
     </>
   );

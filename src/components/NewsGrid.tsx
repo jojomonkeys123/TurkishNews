@@ -88,7 +88,7 @@ export default function NewsGrid({
   oneCikanlar?: Makale[];
 }) {
   const anaListe = ekonomiHaberleri && ekonomiHaberleri.length > 0
-    ? ekonomiHaberleri.slice(0, 3).map((m) => ({
+    ? ekonomiHaberleri.slice(0, 6).map((m) => ({
         category: kategoriAdi(m.kategori),
         pill: KATEGORI_RENK[m.kategori].pill,
         headline: m.baslik,

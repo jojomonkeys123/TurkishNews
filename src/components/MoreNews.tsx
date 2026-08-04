@@ -1,31 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { kategoriAdi, formatSaat } from "@/lib/kategoriler";
+import { KATEGORI_RENK } from "@/lib/kategoriRenkleri";
+import type { Makale } from "@/types";
 
-const opinionPieces = [
+const yedekHaberler = [
   {
-    author: "Prof. Dr. Selim Yıldız",
-    role: "Ekonomist, ODTÜ",
-    headline: "Enflasyonla Mücadelede Kritik Dönemece Giriyoruz",
-    excerpt: "Merkez Bankası'nın son kararları gelecek çeyrek için belirleyici olacak.",
-    avatar: "https://picsum.photos/seed/professor-economist-man/80/80",
-    time: "Bugün",
+    category: "Ekonomi",
+    headline: "Enflasyonla Mücadelede Kritik Dönemeç",
+    image: "https://picsum.photos/seed/economy-fallback-1/400/260",
+    time: "12:44",
+    href: "#",
   },
   {
-    author: "Nilüfer Şahin",
-    role: "Finans Analisti",
+    category: "Piyasalar",
     headline: "Borsa Rallisi Sürdürülebilir mi?",
-    excerpt: "Teknik göstergeler ve temel veriler farklı sinyaller veriyor.",
-    avatar: "https://picsum.photos/seed/female-analyst-finance/80/80",
-    time: "Dün",
+    image: "https://picsum.photos/seed/economy-fallback-2/400/260",
+    time: "11:20",
+    href: "#",
   },
   {
-    author: "Emre Çelik",
-    role: "Küresel Strateji Uzmanı",
+    category: "Küresel",
     headline: "Fed Kararları Türkiye'yi Nasıl Etkiler?",
-    excerpt: "Küresel likidite koşullarındaki değişim gelişmekte olan piyasaları yeniden şekillendiriyor.",
-    avatar: "https://picsum.photos/seed/strategy-expert-suit/80/80",
-    time: "2 gün önce",
+    image: "https://picsum.photos/seed/economy-fallback-3/400/260",
+    time: "10:05",
+    href: "#",
   },
 ];
 
@@ -40,40 +40,62 @@ const liveUpdates = [
   { time: "12:37", text: "Moody's Türkiye için kredi görünümü toplantısı yapıyor" },
 ];
 
-export default function MoreNews() {
+export default function MoreNews({ digerHaberler }: { digerHaberler?: Makale[] }) {
+  const liste =
+    digerHaberler && digerHaberler.length > 0
+      ? digerHaberler.slice(0, 3).map((m) => ({
+          category: kategoriAdi(m.kategori),
+          pill: KATEGORI_RENK[m.kategori].pill,
+          headline: m.baslik,
+          image: m.kapakGorseli || "https://picsum.photos/seed/ekonomi-haber-fallback-more/400/260",
+          time: formatSaat(m.yayinTarihi),
+          href: `/${m.kategori}/${m.slug}`,
+        }))
+      : yedekHaberler.map((n) => ({ ...n, pill: "bg-slate-700" }));
+
   return (
     <section className="max-w-[1400px] mx-auto px-4 py-6">
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
-        {/* Opinion pieces */}
+        {/* Diğer haberler */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-1 h-5 bg-red-600 rounded-full" />
-              <h2 className="text-base font-bold text-slate-900">Köşe Yazıları</h2>
+              <h2 className="text-base font-bold text-slate-900">Diğer Gündem</h2>
             </div>
-            <Link href="#" className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium transition-colors">
+            <Link href="/gundem" className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium transition-colors">
               Tümü <ArrowRight size={12} />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {opinionPieces.map((p, i) => (
-              <Link key={i} href="#" className="group card-press bg-white border border-slate-200 rounded p-4 hover:border-slate-300 transition-[border-color] block">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
-                    <Image src={p.avatar} alt={p.author} fill className="object-cover" sizes="40px" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-slate-900 leading-tight">{p.author}</div>
-                    <div className="text-[11px] text-slate-400 leading-tight">{p.role}</div>
-                  </div>
+            {liste.map((n, i) => (
+              <Link
+                key={i}
+                href={n.href}
+                className="group img-zoom-parent card-press bg-white border border-slate-200 rounded overflow-hidden hover:border-slate-300 transition-[border-color] block"
+              >
+                <div className="relative overflow-hidden aspect-[16/9]">
+                  <Image
+                    src={n.image}
+                    alt={n.headline}
+                    fill
+                    className="object-cover img-zoom"
+                    sizes="(max-width: 768px) 100vw, 320px"
+                  />
                 </div>
-                <h4 className="text-sm font-semibold text-slate-900 leading-snug mb-2 group-hover:text-red-600 transition-colors">
-                  {p.headline}
-                </h4>
-                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{p.excerpt}</p>
-                <div className="flex items-center gap-1 text-slate-400 text-[11px] mt-3">
-                  <Clock size={10} />
-                  <span>{p.time}</span>
+                <div className="p-3.5">
+                  <span
+                    className={`inline-block ${n.pill} text-white text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm`}
+                  >
+                    {n.category}
+                  </span>
+                  <h4 className="text-sm font-semibold text-slate-900 leading-snug mt-2 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors">
+                    {n.headline}
+                  </h4>
+                  <div className="flex items-center gap-1 text-slate-400 text-[11px]">
+                    <Clock size={10} />
+                    <span>{n.time}</span>
+                  </div>
                 </div>
               </Link>
             ))}
