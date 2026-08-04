@@ -15,6 +15,12 @@ export function kategoriAdi(slug: string): string {
   return KATEGORILER.find((k) => k.slug === slug)?.ad ?? slug;
 }
 
+// timeZone açıkça belirtiliyor — aksi halde sunucu (UTC) ve tarayıcı (ziyaretçinin
+// yerel saati) aynı ISO zaman damgası için farklı saatler üretir, bu da React'te
+// hydration hatasına (#418) yol açar. Türkiye saati sabitlenerek hem tutarlılık
+// hem de editoryal doğruluk sağlanıyor.
+const TR_ZAMAN_DILIMI = "Europe/Istanbul";
+
 export function formatTarih(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleString("tr-TR", {
@@ -23,10 +29,11 @@ export function formatTarih(iso: string): string {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: TR_ZAMAN_DILIMI,
   });
 }
 
 export function formatSaat(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: TR_ZAMAN_DILIMI });
 }
