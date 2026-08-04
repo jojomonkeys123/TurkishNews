@@ -6,6 +6,7 @@ import NewsGrid from "@/components/NewsGrid";
 import MarketTable from "@/components/MarketTable";
 import MoreNews from "@/components/MoreNews";
 import KategoriSeridi from "@/components/KategoriSeridi";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import Footer from "@/components/Footer";
 import { KATEGORILER } from "@/lib/kategoriler";
 import {
@@ -54,6 +55,7 @@ export default async function Home() {
       {kategoriSeritleri.map(({ kategori, makaleler }) => (
         <KategoriSeridi key={kategori} kategori={kategori} makaleler={makaleler} />
       ))}
+      <NewsletterSignup />
       <Footer />
     </>
   );

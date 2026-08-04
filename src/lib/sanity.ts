@@ -152,4 +152,39 @@ export const aramaYap = cache(async (query: string, limit = 30): Promise<Makale[
   )
 })
 
+export interface YazarProfil {
+  ad: string
+  soyad: string
+  slug: string
+  unvan?: string
+  uzmanlik?: string
+  bio?: string
+  foto?: string
+  linkedin?: string
+  twitter?: string
+  email?: string
+}
+
+export const getYazar = cache(async (slug: string): Promise<YazarProfil | null> => {
+  return safeFetch(
+    `*[_type == "yazar" && slug.current == $slug][0] {
+      ad, soyad, "slug": slug.current, unvan, uzmanlik, bio,
+      "foto": foto.asset->url, linkedin, twitter, email
+    }`,
+    { slug },
+    null
+  )
+})
+
+export const getYazarMakaleleri = cache(async (yazarSlug: string, limit = 20): Promise<Makale[]> => {
+  return safeFetch(
+    `*[_type == "makale" && yazar->slug.current == $yazarSlug] | order(yayinTarihi desc) [0...$limit] {${MAKALE_ALANLARI}}`,
+    { yazarSlug, limit: limit - 1 }
+  )
+})
+
+export const getTumYazarSlug = cache(async (): Promise<Array<{ slug: string }>> => {
+  return safeFetch(`*[_type == "yazar"] { "slug": slug.current }`)
+})
+
 export const isSanityConfigured = configured

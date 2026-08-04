@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,9 @@ export const metadata: Metadata = {
     title: baslik,
     description: aciklama,
   },
+  alternates: {
+    types: { "application/rss+xml": "/rss.xml" },
+  },
 };
 
 export default function RootLayout({
@@ -46,7 +50,10 @@ export default function RootLayout({
       lang="tr"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-screen bg-slate-100">{children}</body>
+      <body className="min-h-screen bg-slate-100">
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }

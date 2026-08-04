@@ -2,11 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Clock, WarningCircle } from "@phosphor-icons/react/dist/ssr";
+import { CaretRight, Clock, WarningCircle } from "@phosphor-icons/react/dist/ssr";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import Navbar from "@/components/Navbar";
 import MarketBar from "@/components/MarketBar";
 import Footer from "@/components/Footer";
+import ShareButtons from "@/components/ShareButtons";
 import { getMakale, getIlgiliMakeleler, getTumSlug } from "@/lib/sanity";
 import { KATEGORILER, kategoriAdi, formatTarih } from "@/lib/kategoriler";
 import { KATEGORI_RENK } from "@/lib/kategoriRenkleri";
@@ -28,6 +29,17 @@ const portableTextBilesenleri: PortableTextComponents = {
       ) : null,
   },
 };
+
+function okumaSuresiHesapla(icerik: { _type: string; children?: { text?: string }[] }[]): number {
+  const kelimeSayisi = icerik
+    .filter((b) => b._type === "block")
+    .flatMap((b) => b.children || [])
+    .map((c) => c.text || "")
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(kelimeSayisi / 200));
+}
 
 export async function generateStaticParams() {
   const slugs = await getTumSlug();
@@ -84,8 +96,10 @@ export default async function MakaleSayfasi({
   if (!makale) notFound();
 
   const ilgili = await getIlgiliMakeleler(kategori, slug, 4);
+  const okumaSuresi = okumaSuresiHesapla(makale.icerik);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const makaleUrl = `${siteUrl}/${kategori}/${slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -118,6 +132,18 @@ export default async function MakaleSayfasi({
       <MarketBar />
       <Navbar />
       <main className="max-w-[820px] mx-auto px-4 py-8">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-400 mb-4">
+          <Link href="/" className="hover:text-red-600 transition-colors">
+            Anasayfa
+          </Link>
+          <CaretRight size={10} />
+          <Link href={`/${makale.kategori}`} className="hover:text-red-600 transition-colors">
+            {kategoriAdi(makale.kategori)}
+          </Link>
+          <CaretRight size={10} />
+          <span className="text-slate-500 truncate max-w-[240px]">{makale.baslik}</span>
+        </nav>
+
         <Link
           href={`/${makale.kategori}`}
           className={`inline-block ${KATEGORI_RENK[makale.kategori].pill} text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-sm`}
@@ -129,13 +155,21 @@ export default async function MakaleSayfasi({
         </h1>
         <p className="text-slate-600 text-base leading-relaxed mb-5">{makale.ozet}</p>
 
-        <div className="flex items-center gap-3 text-slate-400 text-xs pb-5 border-b border-slate-200">
-          <Clock size={12} />
-          <span>{formatTarih(makale.yayinTarihi)}</span>
-          <span className="text-slate-300">|</span>
-          <span>
-            {makale.yazar.ad} {makale.yazar.soyad}
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-slate-200">
+          <div className="flex items-center gap-3 text-slate-400 text-xs">
+            <Clock size={12} />
+            <span>{formatTarih(makale.yayinTarihi)}</span>
+            <span className="text-slate-300">|</span>
+            <span>{okumaSuresi} dk okuma</span>
+            <span className="text-slate-300">|</span>
+            <Link
+              href={`/yazarlar/${makale.yazar.slug}`}
+              className="font-medium text-slate-600 hover:text-red-600 transition-colors"
+            >
+              {makale.yazar.ad} {makale.yazar.soyad}
+            </Link>
+          </div>
+          <ShareButtons url={makaleUrl} baslik={makale.baslik} />
         </div>
 
         {makale.kapakGorseli && (
