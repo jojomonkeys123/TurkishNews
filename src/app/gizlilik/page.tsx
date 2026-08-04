@@ -40,10 +40,10 @@ export default function GizlilikSayfasi() {
 
       <h2>Üçüncü Taraf Hizmetler</h2>
       <p>
-        Sitemizin çalışması için içerik yönetimi (Sanity), veritabanı (Supabase),
-        e-posta gönderimi (Resend) ve reklam/analitik hizmetleri gibi üçüncü taraf
-        altyapı sağlayıcıları kullanılmaktadır. Bu sağlayıcılar, kendi gizlilik
-        politikaları çerçevesinde veri işler.
+        Sitemizin çalışması için içerik yönetimi (Sanity), e-posta gönderimi (Resend)
+        ve reklam/analitik hizmetleri gibi üçüncü taraf altyapı sağlayıcıları
+        kullanılmaktadır. Bu sağlayıcılar, kendi gizlilik politikaları çerçevesinde
+        veri işler.
       </p>
 
       <h2>Haklarınız</h2>

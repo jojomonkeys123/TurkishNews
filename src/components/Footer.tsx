@@ -30,6 +30,7 @@ const columns = [
     links: [
       { ad: "Hakkımızda", href: "/hakkimizda" },
       { ad: "İletişim", href: "/iletisim" },
+      { ad: "Reklam ve Sponsorluk", href: "/reklam-politikasi" },
     ],
   },
 ];
@@ -73,6 +74,7 @@ export default function Footer() {
             <Link href="/gizlilik" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Gizlilik</Link>
             <Link href="/kullanim-kosullari" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Kullanım Koşulları</Link>
             <Link href="/kvkk" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">KVKK</Link>
+            <Link href="/reklam-politikasi" className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Reklam Politikası</Link>
           </div>
         </div>
       </div>

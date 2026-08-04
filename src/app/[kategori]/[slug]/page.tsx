@@ -71,14 +71,12 @@ export async function generateMetadata({
       type: "article",
       publishedTime: makale.yayinTarihi,
       authors: [`${makale.yazar.ad} ${makale.yazar.soyad}`],
-      images: makale.kapakGorseli ? [{ url: makale.kapakGorseli }] : undefined,
       locale: "tr_TR",
     },
     twitter: {
       card: "summary_large_image",
       title: baslik,
       description: aciklama,
-      images: makale.kapakGorseli ? [makale.kapakGorseli] : undefined,
     },
   };
 }
