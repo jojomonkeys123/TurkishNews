@@ -75,16 +75,11 @@ const FONTI = {
 
 const TOPLAM = parseInt(process.env.ARTICLE_COUNT || '8')
 
-const TUM_KATEGORILER = [
-  'ekonomi',
-  'piyasalar',
-  'gundem',
-  'is-dunyasi',
-  'yasam',
-  'politika',
-  'teknoloji',
-  'kuresel',
-]
+// TARGET_CATEGORIES ile (virgülle ayrılmış) belirli kategoriler hedeflenebilir —
+// ör. sadece ince kalan kategorileri doldurmak için: TARGET_CATEGORIES=teknoloji,kuresel
+const TUM_KATEGORILER = process.env.TARGET_CATEGORIES
+  ? process.env.TARGET_CATEGORIES.split(',').map((k) => k.trim())
+  : ['ekonomi', 'piyasalar', 'gundem', 'is-dunyasi', 'yasam', 'politika', 'teknoloji', 'kuresel']
 
 // Kategoriler arasında dönüşümlü dağıtım yapar — toplam sayı ne olursa olsun
 // (küçük ya da büyük) her kategori dengeli pay alır, sabit bir tavana takılmaz.

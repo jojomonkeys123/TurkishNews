@@ -30,6 +30,7 @@ const columns = [
     links: [
       { ad: "Hakkımızda", href: "/hakkimizda" },
       { ad: "İletişim", href: "/iletisim" },
+      { ad: "Künye", href: "/kunye" },
       { ad: "Reklam ve Sponsorluk", href: "/reklam-politikasi" },
     ],
   },
@@ -47,6 +48,9 @@ export default function Footer() {
             </div>
             <p className="text-sm text-slate-500 leading-relaxed max-w-[220px]">
               Türkiye'nin ekonomi ve finans gündemine tarafsız, bağımsız bakış.
+            </p>
+            <p className="text-xs text-slate-600 mt-3 max-w-[220px]">
+              Küçükçekmece, İstanbul, Türkiye
             </p>
           </div>
           {columns.map((col) => (

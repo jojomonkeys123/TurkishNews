@@ -13,7 +13,7 @@ export default function IletisimSayfasi() {
       <p>
         Görüş, öneri, düzeltme talebi veya iş birliği teklifleriniz için aşağıdaki formu
         kullanabilir ya da doğrudan{" "}
-        <a href="mailto:iletisim@anchormedya.com">iletisim@anchormedya.com</a> adresine
+        <a href="mailto:anchormedyailetisim@gmail.com">anchormedyailetisim@gmail.com</a> adresine
         yazabilirsiniz.
       </p>
       <div className="not-prose mt-6 max-w-[480px]">
