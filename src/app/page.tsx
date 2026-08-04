@@ -5,7 +5,9 @@ import HeroSection from "@/components/HeroSection";
 import NewsGrid from "@/components/NewsGrid";
 import MarketTable from "@/components/MarketTable";
 import MoreNews from "@/components/MoreNews";
+import KategoriSeridi from "@/components/KategoriSeridi";
 import Footer from "@/components/Footer";
+import { KATEGORILER } from "@/lib/kategoriler";
 import {
   getMansetMakaleler,
   getKategoriMakeleri,
@@ -14,12 +16,19 @@ import {
 } from "@/lib/sanity";
 
 export default async function Home() {
-  const [mansetAdaylari, ekonomiHaberleri, sonMakaleler, sonDakika] = await Promise.all([
-    getMansetMakaleler(20),
-    getKategoriMakeleri("ekonomi", 6),
-    getSonMakaleler(18),
-    getSonDakikaMakaleler(6),
-  ]);
+  const [mansetAdaylari, ekonomiHaberleri, sonMakaleler, sonDakika, kategoriSeritleri] =
+    await Promise.all([
+      getMansetMakaleler(20),
+      getKategoriMakeleri("ekonomi", 6),
+      getSonMakaleler(18),
+      getSonDakikaMakaleler(6),
+      Promise.all(
+        KATEGORILER.map(async (k) => ({
+          kategori: k.slug,
+          makaleler: await getKategoriMakeleri(k.slug, 5),
+        }))
+      ),
+    ]);
 
   // Görseli olan makaleler önce gelsin (öncelik sırası korunarak) — slider/sidebar'da
   // rastgele bir yedek görselle düşen eski/görselsiz makaleler olmasın.
@@ -42,6 +51,9 @@ export default async function Home() {
       <NewsGrid ekonomiHaberleri={ekonomiHaberleri} oneCikanlar={oneCikanlar} />
       <MarketTable />
       <MoreNews digerHaberler={digerHaberler} canliTakip={canliTakip} />
+      {kategoriSeritleri.map(({ kategori, makaleler }) => (
+        <KategoriSeridi key={kategori} kategori={kategori} makaleler={makaleler} />
+      ))}
       <Footer />
     </>
   );
