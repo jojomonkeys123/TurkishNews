@@ -84,7 +84,7 @@ export interface EndeksBilgisi {
 }
 
 const YAHOO_SEMBOLLER: Record<string, string> = {
-  "^XU100": "BIST 100",
+  "XU100.IS": "BIST 100",
   "BZ=F": "Brent Petrol",
   "CL=F": "Ham Petrol (WTI)",
   "GC=F": "Altın (Ons)",
@@ -138,7 +138,7 @@ export async function getPiyasaOzetVerisi(): Promise<PiyasaSatiri[]> {
 
   const satirlar: PiyasaSatiri[] = [];
 
-  const bist = endeksler.find((e) => e.sembol === "^XU100");
+  const bist = endeksler.find((e) => e.sembol === "XU100.IS");
   satirlar.push(
     bist
       ? {
@@ -273,7 +273,7 @@ export async function getPiyasaTablolari(): Promise<{
 
   const indices: PiyasaSatiriDetay[] = [
     (() => {
-      const e = bul("^XU100");
+      const e = bul("XU100.IS");
       return e
         ? {
             name: e.ad,
@@ -294,26 +294,35 @@ export async function getPiyasaTablolari(): Promise<{
   return { currencies, commodities, indices };
 }
 
+// Not: Yahoo'nun eski toplu "v7/finance/quote" uç noktası artık 401 (Unauthorized)
+// döndürüyor — Yahoo bu API'yi kısıtladı. Tekil sembol bazlı "v8/finance/chart"
+// uç noktası hâlâ anahtarsız çalışıyor, bu yüzden her sembolü paralel çekiyoruz.
 export async function getYahooEndeksleri(): Promise<EndeksBilgisi[]> {
-  const semboller = Object.keys(YAHOO_SEMBOLLER).join(",");
-  try {
-    const res = await fetch(
-      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(semboller)}`,
-      {
-        headers: { "User-Agent": "Mozilla/5.0" },
-        next: { revalidate: 300 },
+  const girdiler = Object.entries(YAHOO_SEMBOLLER);
+
+  const sonuclar = await Promise.all(
+    girdiler.map(async ([sembol, ad]) => {
+      try {
+        const res = await fetch(
+          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sembol)}?interval=1d&range=1d`,
+          {
+            headers: { "User-Agent": "Mozilla/5.0" },
+            next: { revalidate: 300 },
+          }
+        );
+        if (!res.ok) return null;
+        const data = await res.json();
+        const meta = data?.chart?.result?.[0]?.meta;
+        const fiyat = Number(meta?.regularMarketPrice);
+        if (!fiyat) return null;
+        const onceki = Number(meta?.previousClose ?? meta?.chartPreviousClose ?? fiyat);
+        const degisimYuzde = onceki ? ((fiyat - onceki) / onceki) * 100 : 0;
+        return { sembol, ad, fiyat, degisimYuzde } as EndeksBilgisi;
+      } catch {
+        return null;
       }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    const sonuclar = data?.quoteResponse?.result || [];
-    return sonuclar.map((q: Record<string, number | string>) => ({
-      sembol: q.symbol as string,
-      ad: YAHOO_SEMBOLLER[q.symbol as string] || (q.symbol as string),
-      fiyat: Number(q.regularMarketPrice) || 0,
-      degisimYuzde: Number(q.regularMarketChangePercent) || 0,
-    }));
-  } catch {
-    return [];
-  }
+    })
+  );
+
+  return sonuclar.filter((s): s is EndeksBilgisi => s !== null);
 }

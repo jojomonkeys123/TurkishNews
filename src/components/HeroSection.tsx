@@ -108,6 +108,16 @@ export default function HeroSection({
         }))
       : yedekYanHaberler.map((s) => ({ ...s, pill: kategoriRenginiCoz(s.category).pill }));
 
+  const ekstraListesi = (digerleri || [])
+    .slice(4, 8)
+    .map((m) => ({
+      category: kategoriAdi(m.kategori),
+      pill: KATEGORI_RENK[m.kategori].pill,
+      headline: m.baslik,
+      image: m.kapakGorseli || "https://picsum.photos/seed/ekonomi-haber-fallback-ekstra/200/200",
+      href: `/${m.kategori}/${m.slug}`,
+    }));
+
   const [aktif, setAktif] = useState(0);
   const toplam = slaytListesi.length;
 
@@ -250,6 +260,38 @@ export default function HeroSection({
             ))}
           </div>
         </div>
+
+        {ekstraListesi.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+            {ekstraListesi.map((y, i) => (
+              <Link
+                key={i}
+                href={y.href}
+                className="group/card img-zoom-parent card-press bg-white flex gap-3 rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all p-2"
+              >
+                <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg">
+                  <Image
+                    src={y.image}
+                    alt={y.headline}
+                    fill
+                    className="object-cover img-zoom"
+                    sizes="64px"
+                  />
+                </div>
+                <div className="min-w-0 flex-1 py-0.5">
+                  <span
+                    className={`inline-block ${y.pill} text-white text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm`}
+                  >
+                    {y.category}
+                  </span>
+                  <h4 className="text-slate-900 text-[12px] font-semibold leading-snug mt-1 line-clamp-2 group-hover/card:text-red-600 transition-colors">
+                    {y.headline}
+                  </h4>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -37,7 +37,7 @@ export default async function Home() {
     (a, b) => Number(!!b.kapakGorseli) - Number(!!a.kapakGorseli)
   );
   const slaytlar = gorselliOnce.slice(0, 10);
-  const digerleri = gorselliOnce.slice(10, 14);
+  const digerleri = gorselliOnce.slice(10, 18);
   const baslikliste = (sonDakika.length > 0 ? sonDakika : sonMakaleler).map((m) => m.baslik);
   const oneCikanlar = sonMakaleler.slice(0, 6);
   const digerHaberler = sonMakaleler.slice(6, 12);
