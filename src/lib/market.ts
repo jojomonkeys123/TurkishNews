@@ -198,6 +198,102 @@ export async function getPiyasaOzetVerisi(): Promise<PiyasaSatiri[]> {
   return satirlar;
 }
 
+export interface PiyasaSatiriDetay {
+  name: string;
+  code: string;
+  value: string;
+  change: string;
+  up: boolean;
+}
+
+const currenciesYedek: PiyasaSatiriDetay[] = [
+  { name: "Dolar", code: "USD/TRY", value: "38,47", change: "+0,31%", up: true },
+  { name: "Euro", code: "EUR/TRY", value: "41,82", change: "-0,08%", up: false },
+  { name: "Sterlin", code: "GBP/TRY", value: "48,61", change: "+0,19%", up: true },
+  { name: "Frank", code: "CHF/TRY", value: "43,29", change: "+0,44%", up: true },
+  { name: "Yen", code: "JPY/TRY", value: "0,2614", change: "-0,22%", up: false },
+];
+
+const commoditiesYedek: PiyasaSatiriDetay[] = [
+  { name: "Altın (Ons)", code: "XAU/USD", value: "$3.280", change: "+0,87%", up: true },
+  { name: "Gümüş (Ons)", code: "XAG/USD", value: "$32,14", change: "+1,42%", up: true },
+  { name: "Brent Petrol", code: "BRENT", value: "$74,12", change: "-0,43%", up: false },
+  { name: "Ham Petrol (WTI)", code: "WTI", value: "$71,88", change: "-0,51%", up: false },
+];
+
+const indicesYedek: PiyasaSatiriDetay[] = [
+  { name: "BIST 100", code: "XU100", value: "9.847,32", change: "+1,24%", up: true },
+  { name: "Dow Jones", code: "DJI", value: "43.215", change: "+0,38%", up: true },
+  { name: "S&P 500", code: "SPX", value: "5.932", change: "+0,51%", up: true },
+  { name: "NASDAQ", code: "IXIC", value: "19.448", change: "+0,73%", up: true },
+  { name: "DAX", code: "DAX", value: "23.741", change: "-0,12%", up: false },
+  { name: "FTSE 100", code: "UKX", value: "8.312", change: "+0,09%", up: true },
+];
+
+export async function getPiyasaTablolari(): Promise<{
+  currencies: PiyasaSatiriDetay[];
+  commodities: PiyasaSatiriDetay[];
+  indices: PiyasaSatiriDetay[];
+}> {
+  const [dovizler, endeksler] = await Promise.all([getDovizKurlari(), getYahooEndeksleri()]);
+
+  const bul = (sembol: string) => endeksler.find((e) => e.sembol === sembol);
+  const endeksSatiri = (sembol: string, kod: string, yedek: PiyasaSatiriDetay): PiyasaSatiriDetay => {
+    const e = bul(sembol);
+    if (!e) return yedek;
+    return {
+      name: e.ad,
+      code: kod,
+      value:
+        e.fiyat >= 1000
+          ? `$${e.fiyat.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}`
+          : `$${e.fiyat.toFixed(2)}`,
+      change: `${e.degisimYuzde >= 0 ? "+" : ""}${e.degisimYuzde.toFixed(2)}%`,
+      up: e.degisimYuzde >= 0,
+    };
+  };
+
+  const currencies: PiyasaSatiriDetay[] =
+    dovizler.length > 0
+      ? dovizler.map((d) => ({
+          name: d.ad,
+          code: `${d.kod}/TRY`,
+          value: d.satis.toLocaleString("tr-TR", { minimumFractionDigits: 2 }),
+          change: currenciesYedek.find((c) => c.code === `${d.kod}/TRY`)?.change ?? "",
+          up: currenciesYedek.find((c) => c.code === `${d.kod}/TRY`)?.up ?? true,
+        }))
+      : currenciesYedek;
+
+  const commodities: PiyasaSatiriDetay[] = [
+    endeksSatiri("GC=F", "XAU/USD", commoditiesYedek[0]),
+    endeksSatiri("SI=F", "XAG/USD", commoditiesYedek[1]),
+    endeksSatiri("BZ=F", "BRENT", commoditiesYedek[2]),
+    endeksSatiri("CL=F", "WTI", commoditiesYedek[3]),
+  ];
+
+  const indices: PiyasaSatiriDetay[] = [
+    (() => {
+      const e = bul("^XU100");
+      return e
+        ? {
+            name: e.ad,
+            code: "XU100",
+            value: e.fiyat.toLocaleString("tr-TR", { maximumFractionDigits: 2 }),
+            change: `${e.degisimYuzde >= 0 ? "+" : ""}${e.degisimYuzde.toFixed(2)}%`,
+            up: e.degisimYuzde >= 0,
+          }
+        : indicesYedek[0];
+    })(),
+    endeksSatiri("^DJI", "DJI", indicesYedek[1]),
+    endeksSatiri("^GSPC", "SPX", indicesYedek[2]),
+    endeksSatiri("^IXIC", "IXIC", indicesYedek[3]),
+    endeksSatiri("^GDAXI", "DAX", indicesYedek[4]),
+    endeksSatiri("^FTSE", "UKX", indicesYedek[5]),
+  ];
+
+  return { currencies, commodities, indices };
+}
+
 export async function getYahooEndeksleri(): Promise<EndeksBilgisi[]> {
   const semboller = Object.keys(YAHOO_SEMBOLLER).join(",");
   try {
