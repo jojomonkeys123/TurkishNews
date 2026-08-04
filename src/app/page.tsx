@@ -31,6 +31,7 @@ export default async function Home() {
   const baslikliste = (sonDakika.length > 0 ? sonDakika : sonMakaleler).map((m) => m.baslik);
   const oneCikanlar = sonMakaleler.slice(0, 6);
   const digerHaberler = sonMakaleler.slice(6, 12);
+  const canliTakip = sonMakaleler.slice(12, 18);
 
   return (
     <>
@@ -40,7 +41,7 @@ export default async function Home() {
       <HeroSection slaytlar={slaytlar} digerleri={digerleri} />
       <NewsGrid ekonomiHaberleri={ekonomiHaberleri} oneCikanlar={oneCikanlar} />
       <MarketTable />
-      <MoreNews digerHaberler={digerHaberler} />
+      <MoreNews digerHaberler={digerHaberler} canliTakip={canliTakip} />
       <Footer />
     </>
   );

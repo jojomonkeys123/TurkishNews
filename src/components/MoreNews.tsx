@@ -29,18 +29,20 @@ const yedekHaberler = [
   },
 ];
 
-const liveUpdates = [
-  { time: "14:37", text: "BIST 100 günün en yüksek seviyesini test ediyor: 9.851 puan" },
-  { time: "14:21", text: "Hazine ve Maliye Bakanı basın toplantısı başladı" },
-  { time: "14:05", text: "Dolar kurunda TCMB müdahalesi iddiası piyasayı sarstı" },
-  { time: "13:48", text: "Petrol fiyatları OPEC toplantısı öncesi gerilemeye devam ediyor" },
-  { time: "13:31", text: "Avrupa borsaları günü kırmızıyla tamamlamaya hazırlanıyor" },
-  { time: "13:14", text: "Altın ons fiyatı 3.280 dolar sınırında dalgalanıyor" },
-  { time: "12:55", text: "Türkiye cari açığı Nisan'da 5,1 milyar dolar olarak açıklandı" },
-  { time: "12:37", text: "Moody's Türkiye için kredi görünümü toplantısı yapıyor" },
+const yedekCanliTakip = [
+  { time: "14:37", text: "BIST 100 günün en yüksek seviyesini test ediyor: 9.851 puan", href: "#" },
+  { time: "14:21", text: "Hazine ve Maliye Bakanı basın toplantısı başladı", href: "#" },
+  { time: "14:05", text: "Dolar kurunda TCMB müdahalesi iddiası piyasayı sarstı", href: "#" },
+  { time: "13:48", text: "Petrol fiyatları OPEC toplantısı öncesi gerilemeye devam ediyor", href: "#" },
 ];
 
-export default function MoreNews({ digerHaberler }: { digerHaberler?: Makale[] }) {
+export default function MoreNews({
+  digerHaberler,
+  canliTakip,
+}: {
+  digerHaberler?: Makale[];
+  canliTakip?: Makale[];
+}) {
   const liste =
     digerHaberler && digerHaberler.length > 0
       ? digerHaberler.slice(0, 3).map((m) => ({
@@ -52,6 +54,15 @@ export default function MoreNews({ digerHaberler }: { digerHaberler?: Makale[] }
           href: `/${m.kategori}/${m.slug}`,
         }))
       : yedekHaberler.map((n) => ({ ...n, pill: "bg-slate-700" }));
+
+  const liveUpdates =
+    canliTakip && canliTakip.length > 0
+      ? canliTakip.map((m) => ({
+          time: formatSaat(m.yayinTarihi),
+          text: m.baslik,
+          href: `/${m.kategori}/${m.slug}`,
+        }))
+      : yedekCanliTakip;
 
   return (
     <section className="max-w-[1400px] mx-auto px-4 py-6">
@@ -113,9 +124,9 @@ export default function MoreNews({ digerHaberler }: { digerHaberler?: Makale[] }
           </div>
           <div className="bg-white border border-slate-200 rounded overflow-hidden">
             {liveUpdates.map((u, i) => (
-              <Link key={i} href="#" className="card-press flex gap-3 px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-[background-color]">
+              <Link key={i} href={u.href} className="card-press flex gap-3 px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-[background-color]">
                 <span className="font-mono text-[11px] text-slate-400 shrink-0 pt-0.5">{u.time}</span>
-                <span className="text-xs text-slate-700 leading-relaxed">{u.text}</span>
+                <span className="text-xs text-slate-700 leading-relaxed line-clamp-2">{u.text}</span>
               </Link>
             ))}
           </div>

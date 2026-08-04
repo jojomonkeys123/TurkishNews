@@ -34,7 +34,7 @@ function TableSection({ title, data }: { title: string; data: MarketRow[] }) {
     <div>
       <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
         <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{title}</span>
-        <Link href="#" className="flex items-center gap-1 text-[11px] text-red-600 hover:text-red-700 font-medium">
+        <Link href="/piyasalar" className="flex items-center gap-1 text-[11px] text-red-600 hover:text-red-700 font-medium">
           Tümü <ArrowRight size={11} />
         </Link>
       </div>
